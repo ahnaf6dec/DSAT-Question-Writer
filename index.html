@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAT Question Writter</title>
+
+  <!-- Bootstrap 5 + Google Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: {inlineMath: [["\\(", "\\)"], ["$", "$"]], displayMath: [["\\[", "\\]"], ["$$", "$$"]]},
+      options: {skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]},
+      startup: {typeset: false}
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+  <div class="device-statusbar" role="status" aria-label="Device-style status bar">
+    <div class="status-left"><span class="status-app-dot"></span><span id="statusDate">SAT Practice</span></div>
+    <div class="status-clock" id="statusClock" aria-label="Current time">--:--</div>
+    <div class="status-right" aria-label="Device status">
+      <span class="status-wifi" title="Network"><i class="bi bi-wifi"></i></span>
+      <span class="status-battery" title="Battery-style indicator"><span class="battery-level"></span></span>
+      <button class="statusbar-tool-toggle" id="topbarToggleBtn" type="button" aria-pressed="false"
+        title="Hide top toolbar" aria-label="Hide top toolbar"><i
+          class="bi bi-chevron-bar-up"></i><span>Toolbar</span></button>
+      <button class="recording-toggle" id="recordingModeBtn" type="button" aria-pressed="false"
+        title="Blocks clipboard shortcuts in this page, but not inside the third-party Desmos iframe"><i
+          class="bi bi-record-circle"></i><span>Recording mode</span></button>
+    </div>
+  </div>
+  <header class="appbar">
+    <div class="brand"><span class="brand-dot"></span>Ahnaf Tahmid</div>
+    <div class="top-actions me-2">
+      <button class="btn btn-sm btn-outline-secondary" id="toggleLeftSidebar" title="Hide questions sidebar"
+        aria-label="Hide questions sidebar"><i class="bi bi-layout-sidebar-inset"></i></button>
+      <button class="btn btn-sm btn-outline-secondary" id="toggleRightSidebar" title="Hide editor sidebar"
+        aria-label="Hide editor sidebar"><i class="bi bi-layout-sidebar-inset-reverse"></i></button>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-sm btn-outline-primary" id="desmosBtn"><i class="fa-solid fa-calculator"></i>
+        Desmos</button>
+      <button class="btn btn-sm btn-outline-dark" id="practiceModeBtn"><i class="fa-solid fa-graduation-cap"></i>
+        Practice mode</button>
+      <button class="btn btn-sm btn-outline-dark" id="newBtn"><i class="bi bi-file-earmark-plus"></i> New</button>
+      <button class="btn btn-sm btn-outline-dark" id="importBtn"><i class="bi bi-upload"></i> Import</button>
+      <button class="btn btn-sm btn-dark" id="exportPdfBtn"><i class="bi bi-filetype-pdf"></i> Export PDF</button>
+      <button class="btn btn-sm btn-primary" id="saveBtn"><i class="bi bi-cloud-check"></i> Save</button>
+    </div>
+    <input id="importFile" type="file" accept=".json" hidden>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="side-inner">
+        <div class="sidebar-head">
+          <div class="panel-title">Questions <span id="countLabel"></span></div>
+          <button class="collapse-btn" id="collapseLeft" title="Collapse questions sidebar"
+            aria-label="Collapse questions sidebar"><i class="bi bi-chevron-left"></i></button>
+        </div>
+        <div class="q-list" id="questionList"></div>
+        <button class="add-q mt-2" id="addQuestion"><i class="bi bi-plus-lg"></i> Add question</button>
+
+        <hr class="my-4">
+        <div class="panel-title">Quick tools</div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-sm btn-outline-dark" id="duplicateBtn"><i class="bi bi-copy"></i> Duplicate
+            question</button>
+          <button class="btn btn-sm btn-outline-dark" id="whiteboardBtn"><i class="bi bi-easel2"></i> Web
+            Whiteboard</button>
+          <button class="btn btn-sm btn-outline-dark" id="clearAnnotationsBtn"><i class="bi bi-eraser"></i> Clear
+            annotations</button>
+          <button class="btn btn-sm btn-outline-dark" id="geometryBtn"><i class="bi bi-bezier2"></i> Geometry
+            constructor</button>
+          <div class="crud-actions">
+            <button class="btn btn-sm btn-outline-secondary" id="readBtn" title="Preview selected question"><i
+                class="bi bi-eye"></i> Read</button>
+            <button class="btn btn-sm btn-outline-danger" id="deleteBtn" title="Delete selected question"><i
+                class="bi bi-trash3"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="editor-head">
+        <div class="head-row">
+          <h1 id="editorTitle">Question 4</h1>
+          <span class="badge badge-soft rounded-pill" id="typeBadge">MCQ</span>
+          <span class="badge badge-soft rounded-pill" id="sectionBadge">Reading & Writing</span>
+        </div>
+        <div class="small-note mt-2">Build questions from one intelligent source editor. Lines beginning with A), B),
+          C), D) become choices automatically.</div>
+      </div>
+
+      <section class="question-paper" id="paper">
+        <div class="sat-top">
+          <div class="sat-num" id="paperNumber">4</div>
+          <div class="paper-topic" id="paperTopic">Transition — logical connection</div>
+          <div class="review-box">
+            <div class="bookmark"></div>
+            <label><input type="checkbox" id="reviewCheck"> Mark for Review</label>
+          </div>
+        </div>
+
+        <div class="question-body" id="questionBody">
+          <div id="figureBox" class="figure empty"></div>
+          <div class="question-content" id="renderedQuestion"></div>
+          <div class="annotation-layer" id="annotationLayer">
+            <svg id="annotationSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+
+        <div class="selection-annotation-popover" id="selectionAnnotationPopover" role="toolbar"
+          aria-label="Selected text annotation" hidden>
+          <button type="button" class="selection-action" id="selectionUnderlineBtn" title="Underline selected text"><i
+              class="bi bi-type-underline"></i><span>Underline</span></button>
+          <span class="selection-divider"></span>
+          <span class="selection-colors-label">Highlight</span>
+          <button type="button" class="selection-color" data-selection-color="#ffd400" style="--swatch:#ffd400"
+            title="Yellow highlight" aria-label="Yellow highlight"></button>
+          <button type="button" class="selection-color" data-selection-color="#ff4d6d" style="--swatch:#ff4d6d"
+            title="Pink highlight" aria-label="Pink highlight"></button>
+          <button type="button" class="selection-color" data-selection-color="#1688ff" style="--swatch:#1688ff"
+            title="Blue highlight" aria-label="Blue highlight"></button>
+        </div>
+        <div class="toolbar">
+          <span class="small-note me-1">Annotate:</span>
+          <button class="tool-btn active" data-tool="select" title="Select / move"><i class="bi bi-cursor"></i></button>
+          <button class="tool-btn" data-tool="pen" title="Pen"><i class="bi bi-pencil"></i></button>
+          <button class="tool-btn" data-tool="highlighter" title="Highlighter"><i
+              class="bi bi-highlighter"></i></button>
+          <button class="tool-btn" data-tool="line" title="Line"><i class="bi bi-dash-lg"></i></button>
+          <button class="tool-btn" data-tool="arrow" title="Arrow"><i class="bi bi-arrow-right"></i></button>
+          <button class="tool-btn" data-tool="rect" title="Rectangle"><i class="bi bi-square"></i></button>
+          <button class="tool-btn" data-tool="ellipse" title="Ellipse"><i class="bi bi-circle"></i></button>
+          <button class="tool-btn" data-tool="text" title="Text"><i class="bi bi-type"></i></button>
+          <div class="highlight-palette" role="group" aria-label="Highlight color">
+            <button type="button" class="highlight-swatch active" data-highlight-color="#ffd400"
+              title="Yellow highlight" aria-label="Yellow highlight"></button>
+            <button type="button" class="highlight-swatch" data-highlight-color="#ff4d6d" title="Pink-red highlight"
+              aria-label="Pink-red highlight"></button>
+            <button type="button" class="highlight-swatch" data-highlight-color="#1688ff" title="Blue highlight"
+              aria-label="Blue highlight"></button>
+          </div>
+          <button class="tool-btn" id="highlightSelectionBtn" title="Highlight selected text (Ctrl+H)"><i
+              class="fa-solid fa-highlighter"></i></button>
+          <button class="tool-btn" id="clearHighlightsBtn" title="Clear saved highlights"><i
+              class="fa-solid fa-eraser"></i></button>
+          <button class="tool-btn" id="undoAnn" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>
+          <button class="tool-btn" id="redoAnn" title="Redo"><i class="bi bi-arrow-clockwise"></i></button>
+          <button class="tool-btn" id="eraseAnn" title="Clear annotations"><i class="bi bi-trash3"></i></button>
+          <div class="tool-sep"></div>
+          <input type="color" id="inkColor" value="#111111" title="Ink color"
+            style="width:34px;height:34px;padding:2px;border:1px solid #ddd;border-radius:7px">
+          <select id="inkSize" class="form-select form-select-sm" style="width:85px">
+            <option value="2">2 px</option>
+            <option value="3" selected>3 px</option>
+            <option value="5">5 px</option>
+            <option value="8">8 px</option>
+          </select>
+          <div class="annotation-toggle-wrap">
+            <button class="tool-btn" id="annotationToggle" title="Disable annotations"
+              aria-label="Disable annotations"><i class="bi bi-pencil-square"></i></button>
+            <span class="annotation-state" id="annotationState">ON</span>
+          </div>
+        </div>
+        <div class="practice-panel" id="practicePanel" aria-live="polite">
+          <div class="practice-head"><strong><i class="fa-solid fa-clipboard-check"></i> Practice answer</strong><span
+              class="small-note">Choose an option or enter a response, then submit.</span></div>
+          <div id="practiceControls"></div>
+          <div id="gradeResult" class="grade-result" hidden></div>
+        </div>
+      </section>
+
+      <div class="editor-card">
+        <div class="card-head">
+          <span>Question source</span>
+          <span class="ms-auto math-chip">Markdown</span>
+          <span class="math-chip">LaTeX</span>
+          <button class="btn btn-sm btn-outline-secondary" id="renderBtn"><i class="bi bi-arrow-repeat"></i>
+            Render</button>
+        </div>
+        <textarea id="sourceEditor" spellcheck="false"></textarea>
+        <div class="hint">
+          Intelligent parsing: write the stem normally, then put <b>A)</b>, <b>B)</b>, <b>C)</b>, <b>D)</b> on separate
+          lines.
+          Markdown and LaTeX work in Math mode. Example: <span class="math-chip">\(x^2+3x\)</span>
+        </div>
+      </div>
+
+      <div class="whiteboard-wrap editor-card" id="whiteboardWrap">
+        <div class="card-head">
+          <span><i class="bi bi-easel2 me-1"></i> Web Whiteboard</span>
+          <span class="ms-auto small-note">Loaded from webwhiteboard.com</span>
+          <button class="btn btn-sm btn-outline-secondary" id="whiteboardPopout"><i
+              class="fa-solid fa-up-right-from-square"></i> Open separately</button>
+          <button class="btn btn-sm btn-outline-secondary" id="closeWhiteboard"><i class="fa-solid fa-xmark"></i>
+            Close</button>
+        </div>
+        <div class="whiteboard-frame-wrap">
+          <iframe id="webWhiteboardFrame" title="Web Whiteboard" src="https://excalidraw.com/"
+            allow="fullscreen; clipboard-read; clipboard-write"
+            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+        <div class="whiteboard-fallback small-note">If the website refuses to load inside this panel, use “Open
+          separately” — some sites block iframe embedding for security.</div>
+      </div>
+    </main>
+
+    <aside class="inspector">
+      <div class="section inspector-head-wrap">
+        <div class="inspector-head">
+          <div class="panel-title">Editor</div>
+          <button class="collapse-btn" id="collapseRight" title="Collapse editor sidebar"
+            aria-label="Collapse editor sidebar"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="panel-title">Question type</div>
+        <div class="seg mb-3" id="typeSeg">
+          <button class="active" data-type="mcq">MCQ</button>
+          <button data-type="sr">Student Response</button>
+        </div>
+
+        <div class="panel-title">SAT module</div>
+        <div class="seg" id="sectionSeg">
+          <button class="active" data-section="rw">Reading & Writing</button>
+          <button data-section="math">Math</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="panel-title">Question details</div>
+        <label class="form-label">Question number</label>
+        <input id="numberInput" type="number" min="1" class="form-control mb-3" value="4">
+        <label class="form-label">Title / topic</label>
+        <input id="titleInput" class="form-control mb-3" placeholder="e.g. Transition — cause & effect">
+        <label class="form-label">Difficulty</label>
+        <select id="difficultyInput" class="form-select mb-3">
+          <option>Easy</option>
+          <option selected>Medium</option>
+          <option>Hard</option>
+        </select>
+        <label class="form-label">Domain</label>
+        <select id="domainInput" class="form-select mb-3"></select>
+        <label class="form-label">Skill</label>
+        <input id="skillInput" class="form-control" placeholder="e.g. Transitions">
+      </div>
+
+      <div class="section">
+        <div class="panel-title">Question controls</div>
+        <div class="toggle-row">
+          <span>Mark for review</span>
+          <input class="form-check-input" type="checkbox" id="reviewCheck2">
+        </div>
+        <div class="toggle-row">
+          <span>Allow annotations</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" id="annotationSwitch" checked>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <span>Show choices</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" id="choicesSwitch" checked>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="figureSection">
+        <div class="panel-title">Figure / media</div>
+        <div class="dropzone mb-2" id="dropzone">
+          Drop an image here or
+          <button class="btn btn-link btn-sm p-0" id="uploadFigure">upload</button>
+          <br><span class="small-note">Appears before the problem statement.</span>
+        </div>
+        <input type="file" id="figureInput" accept="image/*" hidden>
+        <button class="btn btn-sm btn-outline-dark w-100 mb-2" id="drawFigure"><i class="bi bi-vector-pen"></i> Draw
+          figure</button>
+        <button class="btn btn-sm btn-outline-dark w-100 mb-2" id="openGeometry"><i class="bi bi-diagram-3"></i>
+          Geometry construction</button>
+        <button class="btn btn-sm btn-outline-secondary w-100" id="removeFigure"><i class="bi bi-image"></i> Remove
+          figure</button>
+      </div>
+
+      <div class="section">
+        <div class="panel-title">Correct answer</div>
+        <input id="answerInput" class="form-control" type="text" placeholder="MCQ: A–D · Student response: 42 or 3/4"
+          autocomplete="off">
+        <div class="small-note mt-2">MCQ: enter A, B, C, or D. Student Response: enter the accepted answer. Use Practice
+          mode below to grade responses.</div>
+      </div>
+
+      <div class="section">
+        <div class="panel-title"><i class="fa-regular fa-note-sticky"></i> Notes</div>
+        <textarea id="questionNotes" class="form-control" rows="4"
+          placeholder="Your reasoning, reminders, or review notes…"></textarea>
+        <div class="small-note mt-2">Saved separately for each question.</div>
+      </div>
+
+      <div class="section">
+        <div class="panel-title">Question CRUD</div>
+        <div class="crud-actions">
+          <button class="btn btn-sm btn-outline-primary" id="crudCreate"><i class="bi bi-plus-lg"></i> Create</button>
+          <button class="btn btn-sm btn-outline-secondary" id="crudRead"><i class="bi bi-eye"></i> Read</button>
+          <button class="btn btn-sm btn-outline-dark" id="crudUpdate"><i class="bi bi-save2"></i> Update</button>
+          <button class="btn btn-sm btn-outline-danger" id="crudDelete"><i class="bi bi-trash3"></i> Delete</button>
+        </div>
+        <div class="small-note mt-2">Create, view, edit/update, or delete the selected question.</div>
+      </div>
+
+      <div class="section">
+        <div class="panel-title">Data</div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-sm btn-outline-dark" id="exportJson"><i class="bi bi-braces"></i> Export JSON</button>
+          <button class="btn btn-sm btn-outline-dark" id="importJson"><i class="bi bi-file-earmark-arrow-up"></i> Import
+            JSON</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <button class="sidebar-reopen" id="reopenLeft" title="Show questions sidebar" aria-label="Show questions sidebar"><i
+      class="bi bi-chevron-right"></i></button>
+  <button class="inspector-reopen" id="reopenRight" title="Show editor sidebar" aria-label="Show editor sidebar"><i
+      class="bi bi-chevron-left"></i></button>
+
+  <div class="geometry-modal" id="geometryModal" aria-hidden="true">
+    <div class="geometry-panel">
+      <div class="d-flex align-items-center px-3 py-2 border-bottom">
+        <strong><i class="bi bi-bezier2"></i> Geometry Constructor</strong>
+        <span class="small-note ms-2">Precise vector geometry — points, lines, circles, angles and constructions</span>
+        <button class="btn btn-sm btn-dark ms-auto" id="closeGeometry"><i class="bi bi-x-lg"></i> Close</button>
+      </div>
+      <div class="geometry-toolbar">
+        <button class="geo-tool active" data-geo="select" title="Select"><i class="bi bi-cursor"></i></button>
+        <button class="geo-tool" data-geo="point" title="Point"><i class="bi bi-dot"></i></button>
+        <button class="geo-tool" data-geo="segment" title="Segment"><i class="bi bi-dash-lg"></i></button>
+        <button class="geo-tool" data-geo="line" title="Line"><i class="bi bi-arrows"></i></button>
+        <button class="geo-tool" data-geo="ray" title="Ray"><i class="bi bi-arrow-right"></i></button>
+        <button class="geo-tool" data-geo="circle" title="Circle: center then radius"><i
+            class="bi bi-circle"></i></button>
+        <button class="geo-tool" data-geo="rect" title="Rectangle"><i class="bi bi-square"></i></button>
+        <button class="geo-tool" data-geo="polygon" title="Polygon — double click to close"><i
+            class="bi bi-pentagon"></i></button>
+        <button class="geo-tool" data-geo="angle" title="Angle — vertex in middle click"><i
+            class="bi bi-triangle"></i></button>
+        <button class="geo-tool" data-geo="perpendicular" title="Perpendicular through a point"><i
+            class="bi bi-intersect"></i></button>
+        <button class="geo-tool" data-geo="parallel" title="Parallel through a point"><i
+            class="bi bi-distribute-horizontal"></i></button>
+        <button class="geo-tool" data-geo="label" title="Label"><i class="bi bi-fonts"></i></button>
+        <span class="tool-sep"></span>
+        <button class="geo-tool" id="geoGrid" title="Toggle grid"><i class="bi bi-grid-3x3"></i></button>
+        <button class="geo-tool" id="geoUndo" title="Undo"><i class="bi bi-arrow-counterclockwise"></i></button>
+        <button class="geo-tool" id="geoRedo" title="Redo"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="geo-tool" id="geoDelete" title="Delete selected"><i class="bi bi-trash3"></i></button>
+        <span class="ms-auto small-note">Snap <input type="checkbox" id="geoSnap" checked> &nbsp; Coordinates <span
+            id="geoCoords">—</span></span>
+        <button class="btn btn-sm btn-outline-dark" id="clearGeometry"><i class="bi bi-eraser"></i> Clear</button>
+        <button class="btn btn-sm btn-primary" id="useGeometryFigure"><i class="bi bi-image"></i> Use as figure</button>
+      </div>
+      <div class="geometry-stage">
+        <svg id="geometrySvg" viewBox="0 0 1000 620" preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="geo-status" id="geoStatus">Select a construction tool. Circle: click the center, then click a point on
+        the circumference.</div>
+    </div>
+  </div>
+
+  <!-- PDF export modal -->
+  <div class="modal fade" id="pdfExportModal" tabindex="-1" aria-labelledby="pdfExportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content pdf-export-modal">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="pdfExportModalLabel"><i class="bi bi-filetype-pdf me-2"></i>Export questions to
+              PDF</h5>
+            <div class="pdf-modal-subtitle">Choose which questions to include in the professional PDF.</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="pdf-selection-bar">
+            <div class="form-check mb-0">
+              <input class="form-check-input" type="checkbox" id="pdfSelectAll" checked>
+              <label class="form-check-label fw-semibold" for="pdfSelectAll">Select all questions</label>
+            </div>
+            <span class="pdf-selection-count" id="pdfSelectionCount">0 selected</span>
+          </div>
+          <div class="pdf-question-list" id="pdfQuestionList"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-dark" id="confirmPdfExport"><i
+              class="bi bi-file-earmark-arrow-down me-1"></i> Export PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="desmos-modal" id="desmosModal" aria-hidden="true">
+    <section class="desmos-window" role="dialog" aria-modal="true" aria-label="Desmos graphing calculator">
+      <header class="desmos-header">
+        <div><strong><i class="fa-solid fa-calculator"></i> Desmos · College Board testing version</strong>
+          <div class="small-note">Drag the window to move it · resize from the lower-right corner</div>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Calculator type"><button class="btn btn-dark"
+              id="desmosGraphingTab">Graphing</button><button class="btn btn-outline-secondary"
+              id="desmosScientificTab">Scientific</button></div>
+          <button class="btn btn-sm btn-outline-secondary" id="desmosPopout"><i
+              class="fa-solid fa-up-right-from-square"></i> Open separately</button><button class="btn btn-sm btn-dark"
+            id="closeDesmos" aria-label="Close calculator"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </header>
+      <div class="desmos-frame-wrap"><iframe id="desmosFrame" title="Desmos College Board Graphing Calculator"
+          src="https://www.desmos.com/testing/collegeboard/graphing?lang=en" allow="fullscreen"
+          allowfullscreen></iframe></div>
+    </section>
+  </div>
+  <div class="status" id="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
